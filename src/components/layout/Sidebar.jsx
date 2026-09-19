@@ -28,7 +28,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
   const firma = settings.firma;
 
   const getLogoContent = () => {
-    if (firma?.logo?.startsWith("http")) {
+    if (firma?.logo?.startsWith("http") || firma?.logo?.startsWith("data:image")) {
       return <img src={firma.logo} alt="Logo" className="h-full w-full object-cover" />;
     }
     if (firma?.logo) {

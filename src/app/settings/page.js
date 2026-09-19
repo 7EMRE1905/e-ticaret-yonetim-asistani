@@ -61,6 +61,17 @@ export default function SettingsPage() {
     setCatEmoji(c.emoji);
   };
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFirma({ ...firma, logo: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
@@ -110,8 +121,14 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-300">Logo (URL veya Emoji)</label>
-                <Input value={firma.logo} onChange={e => setFirma({...firma, logo: e.target.value})} placeholder="https://... veya 🚀" />
+                <label className="text-sm font-medium text-slate-300">Logo (URL, Emoji veya Fotoğraf)</label>
+                <div className="flex gap-2">
+                  <Input className="flex-1" value={firma.logo} onChange={e => setFirma({...firma, logo: e.target.value})} placeholder="https://... veya 🚀" />
+                  <label className="flex items-center justify-center w-10 shrink-0 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-md cursor-pointer hover:bg-indigo-500 hover:text-white transition-colors" title="Fotoğraf Yükle">
+                    <Upload size={18} />
+                    <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                  </label>
+                </div>
               </div>
               <Button type="submit" className="w-full gap-2">
                 <Save size={16} /> Bilgileri Kaydet
