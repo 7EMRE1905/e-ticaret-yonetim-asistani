@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Input, Select } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Plus, Edit2, Trash2, Phone, MapPin, MessageCircle, Truck } from "lucide-react";
+import { generateId } from "@/lib/utils";
 
 export default function WholesalersPage() {
   const { wholesalers, categories, addWholesaler, updateWholesaler, deleteWholesaler } = useStore();
@@ -43,7 +44,7 @@ export default function WholesalersPage() {
     if (editId) {
       updateWholesaler(editId, formData);
     } else {
-      addWholesaler({ id: crypto.randomUUID(), ...formData });
+      addWholesaler({ id: generateId(), ...formData });
     }
     setIsModalOpen(false);
   };

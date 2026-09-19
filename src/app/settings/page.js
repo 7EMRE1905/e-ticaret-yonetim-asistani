@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Save, Plus, Trash2, Edit2, Download, Upload, AlertCircle } from "lucide-react";
+import { generateId } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { 
@@ -48,7 +49,7 @@ export default function SettingsPage() {
       updateCategory(editCatId, { name: catName, emoji: catEmoji || "📂" });
       setEditCatId(null);
     } else {
-      addCategory({ id: crypto.randomUUID(), name: catName, emoji: catEmoji || "📂" });
+      addCategory({ id: generateId(), name: catName, emoji: catEmoji || "📂" });
     }
     setCatName("");
     setCatEmoji("");

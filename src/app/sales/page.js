@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Trash2, ShoppingCart } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
+import { generateId } from "@/lib/utils";
 
 export default function SalesPage() {
   const { sales, products, categories, settings, addSale, deleteSale } = useStore();
@@ -48,7 +49,7 @@ export default function SalesPage() {
     }
 
     addSale({
-      id: crypto.randomUUID(),
+      id: generateId(),
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       categoryId: selectedProduct.categoryId,

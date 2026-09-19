@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Input, Select } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Plus, Search, Edit2, Trash2, PackageMinus, PackagePlus, AlertTriangle } from "lucide-react";
+import { generateId } from "@/lib/utils";
 
 
 export default function ProductsPage() {
@@ -61,7 +62,7 @@ export default function ProductsPage() {
     if (editId) {
       updateProduct(editId, data);
     } else {
-      addProduct({ id: crypto.randomUUID(), ...data });
+      addProduct({ id: generateId(), ...data });
     }
     setIsModalOpen(false);
   };
