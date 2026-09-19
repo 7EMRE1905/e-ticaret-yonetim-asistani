@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/uygunsepety',
+  basePath: '/sepetizm',
 };
 
 export default nextConfig;
