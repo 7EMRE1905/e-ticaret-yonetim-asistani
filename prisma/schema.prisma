@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  emoji     String
+  products  Product[]
+  sales     Sale[]
+  wholesalers Wholesaler[]
+}
+
+model Product {
+  id         String   @id @default(uuid())
+  name       String
+  buyPrice   Float
+  sellPrice  Float
+  stock      Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  sales      Sale[]
+  createdAt  DateTime @default(now())
+}
+
+model Sale {
+  id          String   @id @default(uuid())
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   String
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  productName String
+  qty         Int
+  sell        Float
+  cost        Float
+  shopier     Float
+  shipping    Float
+  deductions  Float
+  net         Float
+  each        Float
+  date        DateTime @default(now())
+}
+
+model Wholesaler {
+  id         String   @id @default(uuid())
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  phone      String
+  location   String?
+  notes      String?
+}
+
+model Settings {
+  id       String @id @default("1")
+  partner1 String
+  partner2 String?
+  shipping Float
+  firmaName String
+  firmaPhone String
+  firmaEmail String
+  firmaAddress String
+  firmaVkn String
+  firmaVd String
+  firmaIg String
+  firmaTiktok String
+  firmaLogo String
+}

@@ -1,12 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { useStore } from "@/store/useStore";
 import "./globals.css";
 
 export default function RootLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { initStore, isInitialized } = useStore();
+
+  useEffect(() => {
+    initStore();
+  }, [initStore]);
+
+  if (!isInitialized) {
+    return (
+      <html lang="tr">
+        <body className="flex h-screen items-center justify-center bg-[#05060f]">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang="tr">
