@@ -84,7 +84,7 @@ export default function SettingsPage() {
             <form onSubmit={handleSaveFirma} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-sm font-medium text-slate-300">Mağaza Adı</label>
-                <Input value={firma.name} onChange={e => setFirma({...firma, name: e.target.value})} placeholder="Uygun Sepety" />
+                <Input value={firma.name} onChange={e => setFirma({...firma, name: e.target.value})} placeholder="Sepetizm" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">

@@ -61,7 +61,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-slate-100 leading-tight">
-              {firma?.name || "Uygun Sepety"}
+              {firma?.name || "Sepetizm"}
             </span>
             <span className="text-[10px] uppercase tracking-wider text-slate-400">
               E-Ticaret Paneli
