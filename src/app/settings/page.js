@@ -17,6 +17,10 @@ export default function SettingsPage() {
     addCategory, 
     updateCategory, 
     deleteCategory,
+    platforms,
+    addPlatform,
+    updatePlatform,
+    deletePlatform,
     resetData 
   } = useStore();
 
@@ -28,6 +32,11 @@ export default function SettingsPage() {
   const [catName, setCatName] = useState("");
   const [catEmoji, setCatEmoji] = useState("");
   const [editCatId, setEditCatId] = useState(null);
+
+  const [platName, setPlatName] = useState("");
+  const [platPercentage, setPlatPercentage] = useState("");
+  const [platFixedFee, setPlatFixedFee] = useState("");
+  const [editPlatId, setEditPlatId] = useState(null);
 
   const handleSaveFirma = (e) => {
     e.preventDefault();
@@ -59,6 +68,32 @@ export default function SettingsPage() {
     setEditCatId(c.id);
     setCatName(c.name);
     setCatEmoji(c.emoji);
+  };
+
+  const handleSavePlatform = (e) => {
+    e.preventDefault();
+    if (!platName) return;
+    const data = { 
+      name: platName, 
+      percentage: parseFloat(platPercentage) || 0, 
+      fixedFee: parseFloat(platFixedFee) || 0 
+    };
+    if (editPlatId) {
+      updatePlatform(editPlatId, data);
+      setEditPlatId(null);
+    } else {
+      addPlatform({ id: generateId(), ...data });
+    }
+    setPlatName("");
+    setPlatPercentage("");
+    setPlatFixedFee("");
+  };
+
+  const handleEditPlat = (p) => {
+    setEditPlatId(p.id);
+    setPlatName(p.name);
+    setPlatPercentage(p.percentage.toString());
+    setPlatFixedFee(p.fixedFee.toString());
   };
 
   const handleLogoUpload = (e) => {
@@ -201,6 +236,58 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Platformlar */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Satış Platformları (Kesinti & Komisyon)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <form onSubmit={handleSavePlatform} className="flex flex-col gap-2 md:flex-row">
+                <Input 
+                  className="flex-1" 
+                  placeholder="Platform Adı (Örn: Shopier)" 
+                  required 
+                  value={platName} 
+                  onChange={e => setPlatName(e.target.value)} 
+                />
+                <Input 
+                  className="w-full md:w-24 text-center" 
+                  placeholder="% Oran"
+                  type="number"
+                  step="0.01"
+                  value={platPercentage} 
+                  onChange={e => setPlatPercentage(e.target.value)} 
+                />
+                <Input 
+                  className="w-full md:w-28 text-center" 
+                  placeholder="Sabit Ücret (₺)"
+                  type="number"
+                  step="0.01"
+                  value={platFixedFee} 
+                  onChange={e => setPlatFixedFee(e.target.value)} 
+                />
+                <Button type="submit" className="shrink-0">
+                  {editPlatId ? <Save size={18} /> : <Plus size={18} />}
+                </Button>
+              </form>
+
+              <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-2">
+                {platforms.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between rounded-lg border border-white/5 bg-black/20 p-3">
+                    <span className="font-medium text-slate-200">{p.name} <span className="text-slate-400 text-sm ml-2">(%{p.percentage} + {p.fixedFee}₺)</span></span>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEditPlat(p)} className="text-slate-400 hover:text-indigo-400"><Edit2 size={16} /></button>
+                      <button onClick={() => { if(confirm('Emin misiniz?')) deletePlatform(p.id) }} className="text-slate-400 hover:text-rose-400"><Trash2 size={16} /></button>
+                    </div>
+                  </div>
+                ))}
+                {platforms.length === 0 && (
+                  <p className="text-sm text-slate-500 text-center py-2">Henüz eklenmiş bir platform yok.</p>
+                )}
               </div>
             </CardContent>
           </Card>

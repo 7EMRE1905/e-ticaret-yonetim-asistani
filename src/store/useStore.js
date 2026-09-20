@@ -16,6 +16,7 @@ export const useStore = create((set, get) => ({
   products: [],
   sales: [],
   wholesalers: [],
+  platforms: [],
   checklist: DEFAULT_CHECKLIST,
   settings: {
     partner1: 'Yetkili Kişi',
@@ -64,6 +65,7 @@ export const useStore = create((set, get) => ({
         products: data.products,
         sales: data.sales,
         wholesalers: data.wholesalers,
+        platforms: data.platforms || [],
         settings: parsedSettings,
         isInitialized: true
       });
@@ -152,6 +154,22 @@ export const useStore = create((set, get) => ({
   deleteWholesaler: async (id) => {
     set((state) => ({ wholesalers: state.wholesalers.filter((w) => w.id !== id) }));
     await actions.deleteWholesaler(id);
+  },
+
+  // Actions - Platforms
+  addPlatform: async (platform) => {
+    set((state) => ({ platforms: [...state.platforms, platform] }));
+    await actions.addPlatform(platform);
+  },
+  updatePlatform: async (id, data) => {
+    set((state) => ({
+      platforms: state.platforms.map((p) => (p.id === id ? { ...p, ...data } : p)),
+    }));
+    await actions.updatePlatform(id, data);
+  },
+  deletePlatform: async (id) => {
+    set((state) => ({ platforms: state.platforms.filter((p) => p.id !== id) }));
+    await actions.deletePlatform(id);
   },
 
   // Actions - Guide/Checklist (still local)

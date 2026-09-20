@@ -8,6 +8,7 @@ export async function getInitialData() {
   const products = await prisma.product.findMany();
   const sales = await prisma.sale.findMany();
   const wholesalers = await prisma.wholesaler.findMany();
+  const platforms = await prisma.platform.findMany();
   let settings = await prisma.settings.findUnique({ where: { id: "1" } });
   
   if (!settings) {
@@ -29,7 +30,18 @@ export async function getInitialData() {
     });
   }
 
-  return { categories, products, sales, wholesalers, settings };
+  return { categories, products, sales, wholesalers, platforms, settings };
+}
+
+// PLATFORM ACTIONS
+export async function addPlatform(data) {
+  return await prisma.platform.create({ data });
+}
+export async function updatePlatform(id, data) {
+  return await prisma.platform.update({ where: { id }, data });
+}
+export async function deletePlatform(id) {
+  return await prisma.platform.delete({ where: { id } });
 }
 
 // CATEGORIES

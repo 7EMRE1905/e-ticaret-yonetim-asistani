@@ -11,6 +11,7 @@ import {
   Truck,
   BookOpen,
   Settings,
+  Landmark
 } from "lucide-react";
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { name: "Ürünler & Stok", href: "/products", icon: Package },
   { name: "Satışlar", href: "/sales", icon: ShoppingCart },
   { name: "Toptancılar", href: "/wholesalers", icon: Truck },
+  { name: "Muhasebe", href: "/accounting", icon: Landmark },
   { name: "İş Rehberi", href: "/guide", icon: BookOpen },
   { name: "Ayarlar", href: "/settings", icon: Settings, divider: true },
 ];

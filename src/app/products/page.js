@@ -6,12 +6,11 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input, Select } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
-import { Plus, Search, Edit2, Trash2, PackageMinus, PackagePlus, AlertTriangle } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, PackageMinus, PackagePlus, AlertTriangle, Calculator, Percent } from "lucide-react";
 import { generateId } from "@/lib/utils";
 
-
 export default function ProductsPage() {
-  const { products, categories, addProduct, updateProduct, deleteProduct, changeStock } = useStore();
+  const { products, categories, platforms, settings, addProduct, updateProduct, deleteProduct, changeStock } = useStore();
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("all");
   
@@ -25,6 +24,34 @@ export default function ProductsPage() {
     sellPrice: "",
     stock: "",
   });
+
+  const [isQuickCalcOpen, setIsQuickCalcOpen] = useState(false);
+  const [qcPlatform, setQcPlatform] = useState("none");
+  const [qcKdv, setQcKdv] = useState("20");
+  const [qcProfit, setQcProfit] = useState("");
+
+  const handleQuickCalc = () => {
+    const buyPrice = parseFloat(formData.buyPrice) || 0;
+    const targetProfit = parseFloat(qcProfit) || 0;
+    const kdvRate = parseFloat(qcKdv) || 0;
+    const shipping = parseFloat(settings?.shipping) || 0;
+    
+    const activePlatform = platforms.find(p => p.id === qcPlatform) || { percentage: 0, fixedFee: 0 };
+    const commRate = parseFloat(activePlatform.percentage) || 0;
+    const fixedFee = parseFloat(activePlatform.fixedFee) || 0;
+
+    const kdvMultiplier = 1 / (1 + kdvRate / 100);
+    const commMultiplier = commRate / 100;
+    const denominator = kdvMultiplier - commMultiplier;
+
+    if (denominator > 0) {
+      const suggestedPrice = (targetProfit + fixedFee + shipping + buyPrice) / denominator;
+      setFormData({ ...formData, sellPrice: suggestedPrice.toFixed(2) });
+      setIsQuickCalcOpen(false);
+    } else {
+      alert("Bu oranlarla zarar ediyorsunuz veya matematiksel olarak kâr imkansız!");
+    }
+  };
 
   const filteredProducts = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -201,7 +228,12 @@ export default function ProductsPage() {
               <Input type="number" step="0.01" min="0" required value={formData.buyPrice} onChange={(e) => setFormData({ ...formData, buyPrice: e.target.value })} />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-300">Satış Fiyatı (₺)</label>
+              <label className="text-sm font-medium flex justify-between text-slate-300">
+                Satış Fiyatı (₺) 
+                <button type="button" onClick={() => setIsQuickCalcOpen(true)} className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-xs">
+                  <Calculator size={12}/> Sihirbaz
+                </button>
+              </label>
               <Input type="number" step="0.01" min="0" required value={formData.sellPrice} onChange={(e) => setFormData({ ...formData, sellPrice: e.target.value })} />
             </div>
           </div>
@@ -215,6 +247,39 @@ export default function ProductsPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Quick Calculator Modal */}
+      <Modal isOpen={isQuickCalcOpen} onClose={() => setIsQuickCalcOpen(false)} title="Akıllı Fiyat Sihirbazı">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-400">Ürün maliyetinize ek olarak kargo, KDV ve platform komisyonlarını hesaplayarak hedeflenen kâr için en uygun satış fiyatını önerir.</p>
+          
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-300">Satış Platformu</label>
+            <Select value={qcPlatform} onChange={(e) => setQcPlatform(e.target.value)}>
+              <option value="none">Kesinti Yok (0%)</option>
+              {platforms.map(p => (
+                <option key={p.id} value={p.id}>{p.name} (%{p.percentage})</option>
+              ))}
+            </Select>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-300">KDV Oranı (%)</label>
+              <Input type="number" value={qcKdv} onChange={(e) => setQcKdv(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-300">Net Kâr Hedefi (₺)</label>
+              <Input type="number" value={qcProfit} onChange={(e) => setQcProfit(e.target.value)} placeholder="Örn: 50" className="border-emerald-500/30 focus:border-emerald-500" />
+            </div>
+          </div>
+
+          <div className="pt-4 flex gap-2">
+            <Button variant="outline" className="flex-1" onClick={() => setIsQuickCalcOpen(false)}>İptal</Button>
+            <Button onClick={handleQuickCalc} className="flex-1 bg-indigo-600 hover:bg-indigo-700">Fiyat Öner ve Uygula</Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
