@@ -18,6 +18,7 @@ export default function AccountingPage() {
   const [cost, setCost] = useState("");
   const [shipping, setShipping] = useState(settings?.shipping || 0);
   const [kdv, setKdv] = useState(20);
+  const [hasInputVat, setHasInputVat] = useState(true); // Fatura ile alındı (Maliyete KDV Dahil)
   const [targetProfit, setTargetProfit] = useState("");
   const [sellingPrice, setSellingPrice] = useState("");
   
@@ -36,25 +37,30 @@ export default function AccountingPage() {
   let resultProfit = 0;
   let kdvAmount = 0;
   let commAmount = 0;
+  let inputVat = 0;
+
+  if (hasInputVat) {
+    inputVat = numCost - (numCost / (1 + numKdv / 100));
+  }
   
   if (calcMode === "findPrice") {
-    // S = (Net + FixedFee + Kargo + Cost) / (1/(1+KDV) - Comm)
+    // S = (Net + FixedFee + Kargo + NetCost) / (1/(1+KDV) - Comm)
     const kdvMultiplier = 1 / (1 + numKdv / 100);
     const commMultiplier = commRate / 100;
     const denominator = kdvMultiplier - commMultiplier;
     
     if (denominator > 0) {
-      resultPrice = (numTargetProfit + fixedFee + numShipping + numCost) / denominator;
+      resultPrice = (numTargetProfit + fixedFee + numShipping + (numCost - inputVat)) / denominator;
       resultProfit = numTargetProfit;
       kdvAmount = resultPrice - (resultPrice / (1 + numKdv / 100));
       commAmount = resultPrice * commMultiplier;
     }
   } else {
-    // Net = S - KDV_Amount - Comm_Amount - FixedFee - Kargo - Cost
+    // Net = S - KDV_Amount - Comm_Amount - FixedFee - Kargo - NetCost
     kdvAmount = numSellingPrice - (numSellingPrice / (1 + numKdv / 100));
     commAmount = numSellingPrice * (commRate / 100);
     resultPrice = numSellingPrice;
-    resultProfit = numSellingPrice - kdvAmount - commAmount - fixedFee - numShipping - numCost;
+    resultProfit = numSellingPrice - kdvAmount - commAmount - fixedFee - numShipping - (numCost - inputVat);
   }
 
   // Summary State (Simple Monthly or All Time)
@@ -136,6 +142,10 @@ export default function AccountingPage() {
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-slate-300">Ürün Maliyeti (₺)</label>
                   <Input type="number" value={cost} onChange={(e) => setCost(e.target.value)} placeholder="0.00" />
+                  <label className="flex items-center gap-2 mt-2 text-xs text-slate-400 cursor-pointer">
+                    <input type="checkbox" checked={hasInputVat} onChange={(e) => setHasInputVat(e.target.checked)} className="rounded border-slate-700 bg-slate-800" />
+                    Maliyete KDV Dahil (Faturalı Alım)
+                  </label>
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-slate-300">Kargo Gideri (₺)</label>
@@ -182,9 +192,16 @@ export default function AccountingPage() {
                     </h4>
                     
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-slate-400">Ürün Maliyeti</span>
+                      <span className="text-slate-400">Ürün Maliyeti (Brüt)</span>
                       <span className="font-medium text-slate-200">-{numCost.toFixed(2)} ₺</span>
                     </div>
+
+                    {hasInputVat && inputVat > 0 && (
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-slate-400">İndirilecek KDV (Devletten Alacak)</span>
+                        <span className="font-medium text-emerald-400">+{inputVat.toFixed(2)} ₺</span>
+                      </div>
+                    )}
                     
                     <div className="flex justify-between items-center py-1">
                       <span className="text-slate-400">Kargo Gideri</span>
@@ -192,7 +209,7 @@ export default function AccountingPage() {
                     </div>
 
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-slate-400">KDV (%{numKdv})</span>
+                      <span className="text-slate-400">Satış KDV'si (%{numKdv})</span>
                       <span className="font-medium text-rose-400">-{kdvAmount.toFixed(2)} ₺</span>
                     </div>
 
@@ -202,8 +219,8 @@ export default function AccountingPage() {
                     </div>
 
                     <div className="flex justify-between items-center py-3 mt-2 border-t border-white/10">
-                      <span className="text-slate-300 font-medium">Toplam Gider (Maliyet Hariç)</span>
-                      <span className="font-bold text-rose-400">{(kdvAmount + commAmount + fixedFee + numShipping).toFixed(2)} ₺</span>
+                      <span className="text-slate-300 font-medium">Net Devlete Ödenecek KDV</span>
+                      <span className="font-medium text-rose-400">{(kdvAmount - inputVat).toFixed(2)} ₺</span>
                     </div>
                   </div>
                 </div>

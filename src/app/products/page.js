@@ -28,6 +28,7 @@ export default function ProductsPage() {
   const [isQuickCalcOpen, setIsQuickCalcOpen] = useState(false);
   const [qcPlatform, setQcPlatform] = useState("none");
   const [qcKdv, setQcKdv] = useState("20");
+  const [qcHasInputVat, setQcHasInputVat] = useState(true);
   const [qcProfit, setQcProfit] = useState("");
 
   const handleQuickCalc = () => {
@@ -44,8 +45,13 @@ export default function ProductsPage() {
     const commMultiplier = commRate / 100;
     const denominator = kdvMultiplier - commMultiplier;
 
+    let inputVat = 0;
+    if (qcHasInputVat) {
+      inputVat = buyPrice - (buyPrice / (1 + kdvRate / 100));
+    }
+
     if (denominator > 0) {
-      const suggestedPrice = (targetProfit + fixedFee + shipping + buyPrice) / denominator;
+      const suggestedPrice = (targetProfit + fixedFee + shipping + (buyPrice - inputVat)) / denominator;
       setFormData({ ...formData, sellPrice: suggestedPrice.toFixed(2) });
       setIsQuickCalcOpen(false);
     } else {
@@ -264,6 +270,13 @@ export default function ProductsPage() {
             </Select>
           </div>
           
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer p-2 bg-black/20 rounded border border-white/5">
+              <input type="checkbox" checked={qcHasInputVat} onChange={(e) => setQcHasInputVat(e.target.checked)} className="rounded border-slate-700 bg-slate-800" />
+              Maliyete KDV Dahil mi? (Faturalı Alım)
+            </label>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-sm font-medium text-slate-300">KDV Oranı (%)</label>
