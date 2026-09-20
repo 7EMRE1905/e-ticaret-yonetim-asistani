@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
   
   // Favicon için resim url'si veya emoji SVG'si oluşturma
   const getFavicon = () => {
-    if (firma.logo?.startsWith("http") || firma.logo?.startsWith("/")) return firma.logo;
+    if (firma.logo?.startsWith("http") || firma.logo?.startsWith("/") || firma.logo?.startsWith("data:image")) return firma.logo;
     if (firma.logo) {
       // Emoji ise SVG Data URI olarak döndür
       return `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${firma.logo}</text></svg>`;
